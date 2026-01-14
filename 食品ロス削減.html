@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食品ロス削減 - 食料を大切に</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+        }
+
+        :root {
+            --primary-green: #2e7d32;
+            --light-green: #4caf50;
+            --dark-green: #1b5e20;
+            --earth-brown: #8d6e63;
+            --light-brown: #d7ccc8;
+            --background: #f9f7f3;
+            --text-dark: #333333;
+            --text-light: #5a5a5a;
+            --white: #ffffff;
+            --japan-red: #e60012;
+            --japan-blue: #1e50a2;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(rgba(30, 60, 30, 0.85), rgba(30, 60, 30, 0.9)), url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            padding: 4rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .tagline {
+            font-size: 1.4rem;
+            max-width: 800px;
+            margin: 0 auto 1.5rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .stats-section, .tips-section, .calculator-section, .impact-section {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            color: var(--dark-green);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 3px solid var(--light-green);
+            display: inline-block;
+        }
+
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 250px;
+            background-color: var(--light-brown);
+            border-radius: 10px;
+            padding: 1.8rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: var(--dark-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            color: var(--earth-brown);
+        }
+
+        .chart-container {
+            margin-top: 2rem;
+            height: 300px;
+            position: relative;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .tip-card {
+            background-color: #f1f8e9;
+            border-left: 5px solid var(--light-green);
+            border-radius: 8px;
+            padding: 1.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .tip-card:hover {
+            background-color: #e8f5e9;
+            transform: translateX(5px);
+        }
+
+        .tip-icon {
+            font-size: 2.2rem;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        .tip-title {
+            font-size: 1.3rem;
+            color: var(--dark-green);
+            margin-bottom: 0.8rem;
+        }
+
+        .calculator {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 600px;
+            margin-top: 1.5rem;
+        }
+
+        .calculator input, .calculator select {
+            padding: 1rem;
+            border: 2px solid var(--light-brown);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .calculator input:focus, .calculator select:focus {
+            border-color: var(--light-green);
+            outline: none;
+        }
+
+        .calculator button {
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .calculator button:hover {
+            background-color: var(--dark-green);
+        }
+
+        .result {
+            background-color: #e8f5e9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .impact-item {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .impact-icon {
+            font-size: 3rem;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        .pledge-section {
+            background: linear-gradient(to right, var(--primary-green), var(--dark-green));
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            margin: 3rem 0;
+        }
+
+        .pledge-button {
+            background-color: white;
+            color: var(--dark-green);
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pledge-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            background-color: var(--dark-green);
+            color: white;
+            text-align: center;
+            padding: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--light-brown);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .tagline {
+                font-size: 1.2rem;
+            }
+            
+            .stats-section, .tips-section, .calculator-section, .impact-section {
+                padding: 1.8rem;
+            }
+            
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header>
+        <h1><i class="fas fa-seedling"></i> 食品ロス削減 - 食料を大切に</h1>
+        <p class="tagline">一粒の米も大切に。私たちの行動が地球を救います。一緒に食品ロス削減に取り組みましょう。</p>
+        <div class="container">
+            <p>世界では毎年13億トンの食料が廃棄されています。これは20億人を養える量です。変化は私たちから始まります。</p>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="container">
+        <!-- データ統計 -->
+        <section class="stats-section">
+            <h2 class="section-title"><i class="fas fa-chart-bar"></i> 食品ロスの現状</h2>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number">600万<span style="font-size:1.5rem">トン</span></div>
+                    <div class="stat-label">日本の年間食品ロス量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">45<span style="font-size:1.5rem">%</span></div>
+                    <div class="stat-label">家庭から発生する食品ロス</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">130<span style="font-size:1.5rem">kg</span></div>
+                    <div class="stat-label">1人当たりの年間食品ロス</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="wasteChart"></canvas>
+            </div>
+        </section>
+
+        <!-- 節約のヒント -->
+        <section class="tips-section">
+            <h2 class="section-title"><i class="fas fa-lightbulb"></i> 食品ロス削減のコツ</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <h3 class="tip-title">必要な分だけ購入</h3>
+                    <p>買い物リストを作成し、必要な分だけ購入することで、食品の期限切れを防ぎます。</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-utensils"></i></div>
+                    <h3 class="tip-title">適量を調理</h3>
+                    <p>食事の人数に合わせて適量を調理し、食べ残しを減らします。</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-box"></i></div>
+                    <h3 class="tip-title">適切な保存</h3>
+                    <p>食品を正しく保存し、種類ごとの保存方法と賞味期限を理解して、食品の寿命を延ばします。</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-recycle"></i></div>
+                    <h3 class="tip-title">残り物の活用</h3>
+                    <p>残った食材を創造的に利用し、新しい料理に変えることで、食品廃棄を減らします。</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-utensil-spoon"></i></div>
+                    <h3 class="tip-title">外食時の節約</h3>
+                    <p>外食時は食べられる量を注文し、残った食品は持ち帰りましょう。</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                    <h3 class="tip-title">寄付・共有</h3>
+                    <p>余っている安全な食品を必要としている人やフードバンクに寄付し、資源を有効活用します。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 食品ロス計算機 -->
+        <section class="calculator-section">
+            <h2 class="section-title"><i class="fas fa-calculator"></i> 食品ロス計算機</h2>
+            <p>あなたやご家族の1週間の食品ロス量とその環境への影響を計算します。</p>
+            
+            <div class="calculator">
+                <div>
+                    <label for="householdSize">家族人数：</label>
+                    <input type="number" id="householdSize" min="1" max="10" value="3">
+                </div>
+                
+                <div>
+                    <label for="wasteFrequency">食品廃棄の頻度：</label>
+                    <select id="wasteFrequency">
+                        <option value="low">少ない（週1-2回）</option>
+                        <option value="medium" selected>普通（週3-5回）</option>
+                        <option value="high">多い（毎日1回以上）</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="wasteAmount">1回あたりの廃棄量：</label>
+                    <select id="wasteAmount">
+                        <option value="small">少量（約100g）</option>
+                        <option value="medium" selected>中量（約250g）</option>
+                        <option value="large">多量（500g以上）</option>
+                    </select>
+                </div>
+                
+                <button id="calculateBtn">私の食品ロスを計算</button>
+            </div>
+            
+            <div id="result" class="result">
+                <h3>計算結果：</h3>
+                <p id="wasteOutput"></p>
+                <p id="impactOutput"></p>
+                <p id="suggestionOutput"></p>
+            </div>
+        </section>
+
+        <!-- 個人の影響 -->
+        <section class="impact-section">
+            <h2 class="section-title"><i class="fas fa-globe-asia"></i> 食品ロス削減の大きな影響</h2>
+            <div class="impact-grid">
+                <div class="impact-item">
+                    <div class="impact-icon"><i class="fas fa-tint"></i></div>
+                    <h3>水資源の節約</h3>
+                    <p>食品ロスを減らすことで農業用水の需要を大幅に削減できます。1kgの食品を節約するごとに約1,000リットルの水を節約できます。</p>
+                </div>
+                <div class="impact-item">
+                    <div class="impact-icon"><i class="fas fa-cloud"></i></div>
+                    <h3>炭素排出量の削減</h3>
+                    <p>食品ロスから発生する温室効果ガスは世界全体の8-10%を占めます。食品ロス削減は気候変動対策に貢献します。</p>
+                </div>
+                <div class="impact-item">
+                    <div class="impact-icon"><i class="fas fa-leaf"></i></div>
+                    <h3>土地資源の保護</h3>
+                    <p>食品ロスを減らすことは農地の需要を減らし、自然生態系と生物多様性の保護に役立ちます。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 誓約セクション -->
+        <section class="pledge-section">
+            <h2>食品ロス削減行動に参加</h2>
+            <p>今から実際の行動を起こし、食品ロスを減らして地球の持続可能な発展に貢献しましょう。</p>
+            <button class="pledge-button" id="pledgeBtn">食品ロス削減を誓います</button>
+            <p id="pledgeCount">すでに <span id="pledgeNumber">18,529</span> 人が誓約しました</p>
+        </section>
+    </main>
+
+    <!-- フッター -->
+    <footer>
+        <h3>食品ロス削減、食料を大切に</h3>
+        <p>一食一食を大切に、一粒一粒を大切に</p>
+        
+        <div class="footer-links">
+            <a href="#"><i class="fas fa-book"></i> リソースセンター</a>
+            <a href="#"><i class="fas fa-hands-helping"></i> 行動に参加</a>
+            <a href="#"><i class="fas fa-newspaper"></i> 最新ニュース</a>
+            <a href="#"><i class="fas fa-envelope"></i> お問い合わせ</a>
+        </div>
+        
+        <p>&copy; 2023 食品ロス削減イニシアチブ | SDGs目標12「つくる責任 つかう責任」に基づく</p>
+        <p class="footer-note"><i class="fas fa-recycle"></i> このウェブサイトは環境に優しいデザインを使用しています</p>
+    </footer>
+
+    <script>
+        // グラフデータの初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 食品ロスソースのグラフ
+            const ctx = document.getElementById('wasteChart').getContext('2d');
+            const wasteChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['家庭からのロス', '外食産業', '小売業', '生産・加工'],
+                    datasets: [{
+                        data: [45, 26, 13, 16],
+                        backgroundColor: [
+                            '#2e7d32',
+                            '#4caf50',
+                            '#8d6e63',
+                            '#d7ccc8'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '食品ロスの発生源分布 (%)',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 計算機機能
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultDiv = document.getElementById('result');
+            const wasteOutput = document.getElementById('wasteOutput');
+            const impactOutput = document.getElementById('impactOutput');
+            const suggestionOutput = document.getElementById('suggestionOutput');
+            
+            calculateBtn.addEventListener('click', function() {
+                // ユーザー入力を取得
+                const householdSize = parseInt(document.getElementById('householdSize').value);
+                const wasteFrequency = document.getElementById('wasteFrequency').value;
+                const wasteAmount = document.getElementById('wasteAmount').value;
+                
+                // 廃棄量の計算
+                let frequencyFactor, amountFactor;
+                
+                // 頻度係数
+                switch(wasteFrequency) {
+                    case 'low': frequencyFactor = 1.5; break;
+                    case 'medium': frequencyFactor = 4; break;
+                    case 'high': frequencyFactor = 7; break;
+                }
+                
+                // 量係数
+                switch(wasteAmount) {
+                    case 'small': amountFactor = 0.1; break;
+                    case 'medium': amountFactor = 0.25; break;
+                    case 'large': amountFactor = 0.5; break;
+                }
+                
+                // 週間廃棄量（kg）の計算
+                const weeklyWaste = householdSize * frequencyFactor * amountFactor;
+                // 年間廃棄量の計算
+                const yearlyWaste = weeklyWaste * 52;
+                // 炭素排出量（kg CO2）の計算
+                const yearlyCO2 = yearlyWaste * 2.5; // 1kgの食品廃棄で約2.5kgのCO2が発生
+                // 水資源の浪費（リットル）の計算
+                const yearlyWater = yearlyWaste * 1000; // 1kgの食品生産には約1000リットルの水が必要
+                
+                // 結果の表示
+                wasteOutput.innerHTML = `ご家庭の年間食品ロス量は約 <strong>${yearlyWaste.toFixed(1)} kg</strong> です。`;
+                impactOutput.innerHTML = `これは <strong>${yearlyCO2.toFixed(1)} kg</strong> の二酸化炭素排出と <strong>${yearlyWater.toFixed(0)} リットル</strong> の水資源の浪費に相当します。`;
+                
+                // 廃棄量に基づいたアドバイス
+                let suggestion;
+                if (yearlyWaste < 50) {
+                    suggestion = "食品ロス量は低水準です。この良い習慣を続けましょう！";
+                } else if (yearlyWaste < 100) {
+                    suggestion = "食品ロス量は中程度です。買い物リストの作成や適切な保存方法など、さらなる節約のコツを試してみましょう。";
+                } else {
+                    suggestion = "食品ロス量は高水準です。必要な分だけ購入し、適量を調理することから改善を始め、徐々に食品ロスを減らしましょう。";
+                }
+                
+                suggestionOutput.innerHTML = `<strong>アドバイス：</strong> ${suggestion}`;
+                
+                // 結果を表示
+                resultDiv.classList.add('show');
+                
+                // 結果までスクロール
+                resultDiv.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+            });
+
+            // 誓約ボタン機能
+            const pledgeBtn = document.getElementById('pledgeBtn');
+            const pledgeNumber = document.getElementById('pledgeNumber');
+            
+            pledgeBtn.addEventListener('click', function() {
+                let currentCount = parseInt(pledgeNumber.textContent);
+                currentCount++;
+                pledgeNumber.textContent = currentCount.toLocaleString();
+                
+                pledgeBtn.innerHTML = '<i class="fas fa-check"></i> 食品ロス削減を誓約済み';
+                pledgeBtn.style.backgroundColor = '#4caf50';
+                pledgeBtn.disabled = true;
+                
+                // 感謝メッセージを表示
+                alert('食品ロス削減への誓約、ありがとうございます！\nあなたは世界の食品ロス削減行動に参加しました。');
+            });
+
+            // インタラクティブ効果を追加
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.1)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = 'none';
+                });
+            });
+            
+            // ページ読み込み時のアニメーションを追加
+            const sections = document.querySelectorAll('.stats-section, .tips-section, .calculator-section, .impact-section');
+            sections.forEach((section, index) => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    section.style.transition = 'opacity 0.8s, transform 0.8s';
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }, 200 + (index * 200));
+            });
+        });
+    </script>
+</body>
+</html>
